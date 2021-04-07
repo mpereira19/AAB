@@ -3,6 +3,8 @@ class SuffixTreeMulti:
     def __init__(self):
         self.nodes = {0: (-1, {})}  # root node
         self.num = 0
+        self.seq1 = ''
+        self.seq2 = ''
 
     def print_tree(self):
         for k in self.nodes.keys():
@@ -31,6 +33,8 @@ class SuffixTreeMulti:
             pos += 1
 
     def suffix_tree_from_seq(self, text, text1):
+        self.seq1 = text
+        self.seq2 = text1
         t = text + "$"
         t1 = text1 + '#'
         for seq in [t, t1]:
@@ -90,68 +94,104 @@ class SuffixTreeMulti:
         return sorted(res)
 
     def matches_prefix(self, prefix):
-        prefix_code = self.find_pattern(prefix)
         res = []
         res1 = []
-        if not prefix_code:
+        a = 0
+        b = 0
+        if prefix not in self.seq1 and prefix not in self.seq2:
             return (0, res), (1, res1)
-        else:
-            for pos in prefix_code:
-                if pos[1] == 0:
-                    first = self.nodes_below(self.nodes[0][1][prefix[0]])
-                    if len(first) == len(prefix):
-                        res.append(prefix)
-                    else:
-                        res.append(prefix)
-                        string = prefix
-                        lst1 = []
-                        for s in first:
-                            ss = list(self.nodes[s][1].keys())
-                            if '$' in ss:
-                                ss.remove('$')
-                                if len(ss) == 0:
-                                    for i in lst1:
-                                        res.append(i)
-                                    break
-                                else:
-                                    string += ss[0]
-                                    res.append(string)
-                                    for i in lst1:
-                                        res.append(i)
-                                    lst1 = []
-                            elif "$" not in ss:
-                                string += ss[0]
-                                lst1.append(string)
 
-                elif pos[1] == 1:
-                    first = self.nodes_below(self.nodes[0][1][prefix[0]])
-                    if len(first) == len(prefix):
-                        res1.append(prefix)
+        elif prefix in self.seq1 and prefix not in self.seq2:
+            for p in range(len(self.seq1)):
+                if self.seq1[p] == prefix[0]:
+                    a = p
+                    for l in range(len(prefix)):
+                        if self.seq1[p + l] == prefix[l]:
+                            i = True
+                            pass
+                        else:
+                            i = False
+                            break
+                    if i == True:
+                        string = self.seq1[a + len(prefix):]
+                        res.append(self.seq1[a:])
+                        for f in range(len(string)):
+                            res.append(prefix + string[:f])
+                        return (0, sorted(list(set(res)))), (1, res1)
                     else:
-                        res1.append(prefix)
-                        string = prefix
-                        lst2 = []
-                        for s in first:
-                            ss = list(self.nodes[s][1].keys())
-                            if '#' in ss:
-                                ss.remove('#')
-                                if len(ss) == 0:
-                                    for i in lst2:
-                                        res1.append(i)
-                                    break
-                                else:
-                                    string += ss[0]
-                                    res1.append(string)
-                                    for i in lst2:
-                                        res1.append(i)
-                                    lst2 = []
-                            elif '#' not in ss:
-                                string += ss[0]
-                                lst2.append(string)
+                        return (0, res), (1, res1)
+
+        elif prefix not in self.seq1 and prefix in self.seq2:
+            for p in range(len(self.seq2)):
+                if self.seq2[p] == prefix[0]:
+                    b = p
+                    for l in range(len(prefix)):
+                        if self.seq2[p + l] == prefix[l]:
+                            i = True
+                            pass
+                        else:
+                            i = False
+                            break
+                    if i == True:
+                        string = self.seq2[b + len(prefix):]
+                        res1.append(self.seq2[b:])
+                        for f in range(len(string)):
+                            res1.append(prefix + string[:f])
+                        return (0, res), (1, sorted(list(set(res1))))
+                    else:
+                        return (0, res), (1, res1)
+
+        else:
+            for p in range(len(self.seq1)):
+                if self.seq1[p] == prefix[0]:
+                    a = p
+                    for l in range(len(prefix)):
+                        if self.seq1[p + l] == prefix[l]:
+                            i = True
+                            pass
+                        else:
+                            i = False
+                            break
+                    if i == True:
+                        string = self.seq1[a + len(prefix):]
+                        res.append(self.seq1[a:])
+                        for f in range(len(string)):
+                            res.append(prefix + string[:f])
+                if self.seq2[p] == prefix[0]:
+                    b = p
+                    for l in range(len(prefix)):
+                        if self.seq2[p + l] == prefix[l]:
+                            i = True
+                            pass
+                        else:
+                            i = False
+                            break
+                    if i == True:
+                        string = self.seq2[b + len(prefix):]
+                        res1.append(self.seq2[b:])
+                        for f in range(len(string)):
+                            res1.append(prefix + string[:f])
         return (0, sorted(list(set(res)))), (1, sorted(list(set(res1))))
 
     def largestCommonSubstring(self):
-        pass
+        lst = []
+        string1 = self.seq1
+        string2 = self.seq2
+
+        for sub in range(len(string1)):
+            lst.append(string1[sub:])
+        lst = list(set(lst))
+        for p in lst:
+            if p not in string2:
+                print(p)
+                lst.remove(p)
+        if len(lst) == 0:
+            return None
+        elif len(lst) == 1:
+            return lst
+        else:
+            sorted(lst, key=len, reverse=True)
+            return lst[0]
 
 
 def test():
@@ -165,6 +205,6 @@ def test():
     print(stm.nodes_below(12))
     print(stm.matches_prefix('TA'))
     print(stm.matches_prefix('GT'))
-
+    print(stm.largestCommonSubstring())
 
 test()
