@@ -112,14 +112,12 @@ class SuffixTreeMulti:
                         else:
                             i = False
                             break
-                    if i == True:
+                    if i is True:
                         string = self.seq1[a + len(prefix):]
                         res.append(self.seq1[a:])
                         for f in range(len(string)):
                             res.append(prefix + string[:f])
-                        return (0, sorted(list(set(res)))), (1, res1)
-                    else:
-                        return (0, res), (1, res1)
+                        return (0, sorted(list(set(res)), key=len)), (1, res1)
 
         elif prefix not in self.seq1 and prefix in self.seq2:
             for p in range(len(self.seq2)):
@@ -132,14 +130,12 @@ class SuffixTreeMulti:
                         else:
                             i = False
                             break
-                    if i == True:
+                    if i is True:
                         string = self.seq2[b + len(prefix):]
                         res1.append(self.seq2[b:])
                         for f in range(len(string)):
                             res1.append(prefix + string[:f])
-                        return (0, res), (1, sorted(list(set(res1))))
-                    else:
-                        return (0, res), (1, res1)
+                        return (0, res), (1, sorted(list(set(res1)), key=len))
 
         else:
             for p in range(len(self.seq1)):
@@ -152,11 +148,14 @@ class SuffixTreeMulti:
                         else:
                             i = False
                             break
-                    if i == True:
+                    if i is True:
                         string = self.seq1[a + len(prefix):]
                         res.append(self.seq1[a:])
                         for f in range(len(string)):
                             res.append(prefix + string[:f])
+                        break
+
+            for p in range(len(self.seq1)):
                 if self.seq2[p] == prefix[0]:
                     b = p
                     for l in range(len(prefix)):
@@ -166,12 +165,12 @@ class SuffixTreeMulti:
                         else:
                             i = False
                             break
-                    if i == True:
-                        string = self.seq2[b + len(prefix):]
+                    if i is True:
+                        string1 = self.seq2[b + len(prefix):]
                         res1.append(self.seq2[b:])
-                        for f in range(len(string)):
-                            res1.append(prefix + string[:f])
-        return (0, sorted(list(set(res)))), (1, sorted(list(set(res1))))
+                        for f in range(len(string1)):
+                            res1.append(prefix + string1[:f])
+            return (0, sorted(list(set(res)), key=len)), (1, sorted(list(set(res1)), key=len))
 
     def largestCommonSubstring(self):
         lst = []
@@ -183,7 +182,6 @@ class SuffixTreeMulti:
         lst = list(set(lst))
         for p in lst:
             if p not in string2:
-                print(p)
                 lst.remove(p)
         if len(lst) == 0:
             return None
