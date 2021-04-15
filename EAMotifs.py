@@ -46,12 +46,12 @@ class EAMotifsReal (EvolAlgorithm):
 
     def initPopul(self, indsize):
         maxvalue = self.motifs.seqSize(0) - self.motifs.motifSize
-        self.popul = PopulReal(self.popsize, indsize, maxvalue, [])
+        self.popul = PopulReal(self.popsize, indsize, ub=maxvalue, indivs=[])
 
     def vec_to_pwm(self, v):
         pwm = createMatZeros(len(self.motifs.alphabet), self.motifs.motifSize)
         for i in range(0, len(v), len(self.motifs.alphabet)):
-            col_idx = i / len(self.motifs.alphabet)
+            col_idx = int(i / len(self.motifs.alphabet))
             col = v[i:i + len(self.motifs.alphabet)]
             soma = sum(col)
             for j in range(len(self.motifs.alphabet)):
@@ -62,12 +62,13 @@ class EAMotifsReal (EvolAlgorithm):
         for i in range(len(indivs)):
             ind = indivs[i]
             sol = ind.getGenes()
-            self.motifs.pwm = self.vec_to_pwm(sol)
+            pwm = self.vec_to_pwm(sol)
             s = []
+            my_motif = MyMotifs(pwm, self.motifs.alphabet)
             for seq in self.motifs.seqs:
-                p = self.motifs.mostProbableSeq(seq)
+                p = my_motif.mostProbableSeq(seq)
                 s.append(p)
-            fit = self.motifs.scoreMult(sol, self.motifs.pwm)
+            fit = self.motifs.scoreMult(sol, pwm)
             ind.setFitness(fit)
 
 

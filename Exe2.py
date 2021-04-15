@@ -82,8 +82,7 @@ class SuffixTreeMulti:
                     type(self.nodes[k][0]) == tuple and self.nodes[k][0][0] < 0:
                 if '$' in self.nodes[k][1]:
                     lst.append(self.nodes[k][1]['$'])
-                if '$' in self.nodes[k][1] and len(self.nodes[k][1]) == 1 or '#' in self.nodes[k][1] and\
-                        len(self.nodes[k][1]) == 1:
+                if '$' in self.nodes[k][1] and len(self.nodes[k][1]) == 1 or '#' in self.nodes[k][1]:
                     lst.append(k)
                 if '#' in self.nodes[k][1]:
                     lst.append(self.nodes[k][1]['#'])

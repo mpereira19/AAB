@@ -51,7 +51,7 @@ class MotifFinding:
         motif = self.createMotifFromIndexes(s)
         motif.doCounts()
         mat = motif.counts
-        mat = [[mat[lin][col] + 1 for col in range(len(mat[0]))]for lin in range(len(mat))]
+        mat = [[mat[lin][col] + 1 for col in range(len(mat[0]))] for lin in range(len(mat))]
         for j in range(len(mat[0])):
             maxcol = mat[0][j]
             for i in range(1, len(mat)):
