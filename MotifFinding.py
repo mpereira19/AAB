@@ -1,7 +1,6 @@
 from MySeq import MySeq
 from MyMotifs import MyMotifs
 
-
 class MotifFinding:
 
     def __init__(self, size=8, seqs=None):
@@ -61,11 +60,14 @@ class MotifFinding:
             score += maxcol
         return score
 
-    def scoreMult(self, s):
+    def scoreMult(self, s, no_new_pwm=[]):
         score = 1.0
         motif = self.createMotifFromIndexes(s)
-        motif.createPWM()
-        mat = motif.pwm
+        if no_new_pwm == []:
+            motif.createPWM()
+            mat = motif.pwm
+        else:
+            mat = no_new_pwm
         for j in range(len(mat[0])):
             maxcol = mat[0][j]
             for i in range(1, len(mat)):
@@ -194,30 +196,73 @@ class MotifFinding:
                 improve = False
         return s
 
-    # Gibbs sampling 
-
-    def gibbs(self):
+    def heuristicStochastic_ex(self):
         from random import randint
         s = [0] * len(self.seqs)
         for i in range(len(self.seqs)):
             s[i] = randint(0, self.seqSize(i) - self.motifSize)
-        best_score = self.score(s)
+
+        best_score = self.score_pseudo(s)
         improve = True
         while improve:
-            seq_rmv = randint(0, len(self.seqs) - 1)
-            seq = self.seqs.pop(seq_rmv)
-            s_partial = s.copy().remove(seq.rmv)
-            motif = self.createMotifFromIndexes(s_partial)
+            motif = self.createMotifFromIndexes(s)
             motif.createPWM()
-            s[seq_rmv] = motif.mostProbableSeq(seq)
-            self.seqs.insert(seq_rmv, seq)
-            scr = self.score(s)
+            motif.pwm = [[motif.pwm[lin][col] + 0.1 for col in range(len(motif.pwm[0]))] for lin in range(len(motif.pwm))]
+            for i in range(len(self.seqs)):
+                s[i] = motif.mostProbableSeq(self.seqs[i])
+            scr = self.score_pseudo(s)
             if scr > best_score:
                 best_score = scr
             else:
                 improve = False
-
         return s
+
+    # Gibbs sampling 
+
+    def gibbs(self, iterations=1000):
+        from random import randint
+        s = [randint(0, len(self.seqs[i]) - self.motifSize - 1) for i in range(len(self.seqs))]
+        best_score = self.score(s)
+        bests = list(s)
+        for it in range(iterations):
+            seq_index = randint(0, len(self.seqs) - 1)
+            seq = self.seqs[seq_index]
+            s.pop(seq_index)
+            removed = self.seqs.pop(seq_index)
+            motif = self.createMotifFromIndexes(s)
+            motif.createPWM()
+            self.seqs.insert(seq_index, removed)
+            r = motif.probAllPositions(seq)
+            pos = self.roulette(r)
+            s.insert(seq_index, pos)
+            score = self.score(s)
+            if score > best_score:
+                best_score = score
+                bests = list(s)
+        return bests
+
+    def gibbs_ex(self, iterations=1000):
+        from random import randint
+        s = [randint(0, len(self.seqs[i]) - self.motifSize - 1) for i in range(len(self.seqs))]
+        best_score = self.score_pseudo(s)
+        bests = list(s)
+        for it in range(iterations):
+            seq_index = randint(0, len(self.seqs) - 1)
+            seq = self.seqs[seq_index]
+            s.pop(seq_index)
+            removed = self.seqs.pop(seq_index)
+            motif = self.createMotifFromIndexes(s)
+            motif.createPWM()
+            motif.pwm = [[motif.pwm[lin][col] + 0.1 for col in range(len(motif.pwm[0]))] for lin in range(len(motif.pwm))]
+            self.seqs.insert(seq_index, removed)  # vai voltar a adicionar a seq removida à lista de seqs na posição seq_index
+            r = motif.probAllPositions(seq)
+            pos = self.roulette(r)
+            s.insert(seq_index, pos)
+            score = self.score_pseudo(s)
+            if score > best_score:
+                best_score = score
+                bests = list(s)
+        return bests
 
     def roulette(self, f):
         from random import random
@@ -231,53 +276,8 @@ class MotifFinding:
             ind += 1
         return ind - 1
 
-    def gibbs1(self):  # Incompleto
-        from random import randint
-        s = [0] * len(self.seqs)
-        # inicia todas as posicoes com valores aleatorios
-        for i in range(len(self.seqs)):
-            s[i] = randint(0, self.seqSize(i) - self.motifSize)
-        best_sc = self.score(s)
-        improve = True
-        while improve:
-            print(best_sc, s)
-            # Escolher uma das seqs aleatoriamente
-            seq_out = randint(0, len(self.seqs) - 1)
 
-            # removemos a sequencia da lista
-            seq_t = self.seqs.pop(seq_out)
-
-            # criar o perfil com base nas posicoes iniciais sem a seq escolhida
-            # removemos a referencia do vetor de posicoes iniciais
-
-            s_parcial = []
-            for i in s:
-                if i != s[seq_out]:
-                    s_parcial.append(i)
-            lst_seq = [j for j in self.seqs]
-
-            # criamos o perfil sem a seq removida
-            motif = self.createMotifFromIndexes(s_parcial)
-            motif.createPWM()
-
-            # insere a melhor posicao inicial na seq considerando o perfil
-            s[seq_out] = motif.mostProbableSeq(lst_seq)
-            self.seqs.insert(seq_out, seq_t)
-
-            # calcula o novo score
-            s = [j for j in s if j != -1]
-            print(best_sc, s)
-            Scr = self.score(s)
-
-            # verifica se houve melhoria
-            if Scr > best_sc:
-                best_sc = Scr
-            else:
-                improve = False
-        return s
 # tests
-
-
 def test1():
     sm = MotifFinding()
     sm.readFile("exemploMotifs.txt", "dna")
@@ -332,10 +332,15 @@ def test4():
     print(mf.score_pseudo(sol))
     print("Score mult:", mf.scoreMult(sol))
     print("Consensus:", mf.createMotifFromIndexes(sol).consensus())
-
-    # sol2 = mf.gibbs(1000)
-    # print ("Score:" , mf.score(sol2))
-    # print ("Score mult:" , mf.scoreMult(sol2))
+    sol2 = mf.gibbs(1000)
+    print("Score:", mf.score(sol2))
+    print("Score mult:", mf.scoreMult(sol2))
 
 
 test1()
+print()
+test2()
+print()
+test3()
+print()
+test4()

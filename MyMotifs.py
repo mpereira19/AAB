@@ -1,23 +1,29 @@
 
 def createMatZeros(nl, nc):
     res = []
-    for i in range(0, nl):
-        res.append([0] * nc)
+    for _ in range(0, nl):
+        res.append([0]*nc)
     return res
 
 
 def printMat(mat):
-    for i in range(0, len(mat)): print(mat[i])
+    for i in range(0, len(mat)):
+        print(mat[i])
 
 
 class MyMotifs:
 
-    def __init__(self, seqs):
-        self.size = len(seqs[0])
-        self.seqs = seqs  # objetos classe MySeq
-        self.alphabet = seqs[0].alfabeto()
-        self.doCounts()
-        self.createPWM()
+    def __init__(self, seqs=[], pwm=[], alphabet=None):
+        if seqs:
+            self.size = len(seqs[0])
+            self.seqs = seqs  # objetos classe MySeq
+            self.alphabet = seqs[0].alfabeto()
+            self.doCounts()
+            self.createPWM()
+        else:
+            self.pwm = pwm
+            self.size = len(pwm[0])
+            self.alphabet = alphabet
 
     def __len__(self):
         return self.size
@@ -32,7 +38,6 @@ class MyMotifs:
     def createPWM(self):
         if self.counts is None:
             self.doCounts()
-            self.counts = [[self.counts[lin][col] + 1 for col in range(len(self.counts[0]))] for lin in range(len(self.counts))]
         self.pwm = createMatZeros(len(self.alphabet), self.size)
         for i in range(len(self.alphabet)):
             for j in range(self.size):
@@ -74,14 +79,14 @@ class MyMotifs:
 
     def probAllPositions(self, seq):
         res = []
-        for k in range(len(seq) - self.size + 1):
+        for _ in range(len(seq) - self.size + 1):
             res.append(self.probabSeq(seq))
         return res
 
     def mostProbableSeq(self, seq):
         maximo = -1.0
         maxind = -1
-        for k in range(len(seq) - self.size):
+        for k in range(len(seq)-self.size):
             p = self.probabSeq(seq[k:k + self.size])
             if p > maximo:
                 maximo = p

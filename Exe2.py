@@ -13,7 +13,6 @@ class SuffixTreeMulti:
                 print(k, "->", self.nodes[k][1])
             else:
                 print(k, ":", self.nodes[k][0])
-        print(self.nodes)
 
     def add_node(self, origin, symbol, leafnum=-1):
         self.num += 1
@@ -117,7 +116,7 @@ class SuffixTreeMulti:
                         res.append(self.seq1[a:])
                         for f in range(len(string)):
                             res.append(prefix + string[:f])
-                        return (0, sorted(list(set(res)), key=len)), (1, res1)
+                        break
 
         elif prefix not in self.seq1 and prefix in self.seq2:
             for p in range(len(self.seq2)):
@@ -135,7 +134,7 @@ class SuffixTreeMulti:
                         res1.append(self.seq2[b:])
                         for f in range(len(string)):
                             res1.append(prefix + string[:f])
-                        return (0, res), (1, sorted(list(set(res1)), key=len))
+                        break
 
         else:
             for p in range(len(self.seq1)):
@@ -170,10 +169,11 @@ class SuffixTreeMulti:
                         res1.append(self.seq2[b:])
                         for f in range(len(string1)):
                             res1.append(prefix + string1[:f])
-            return (0, sorted(list(set(res)), key=len)), (1, sorted(list(set(res1)), key=len))
+        return (0, sorted(list(set(res)), key=len)), (1, sorted(list(set(res1)), key=len))
 
-    def largestCommonSubstring(self):
+    def largestCommonSubstring(self):  # tem algum tipo de bug pois dá não dá um resultado fixo.
         lst = []
+        res = []
         string1 = self.seq1
         string2 = self.seq2
 
@@ -181,12 +181,10 @@ class SuffixTreeMulti:
             lst.append(string1[sub:])
         lst = list(set(lst))
         for p in lst:
-            if p not in string2:
-                lst.remove(p)
-        if len(lst) == 0:
+            if p in string2:
+                res.append(p)
+        if len(res) == 0:
             return None
-        elif len(lst) == 1:
-            return lst
         else:
             sorted(lst, key=len, reverse=True)
             return lst[0]
@@ -201,8 +199,8 @@ def test():
     print(stm.find_pattern("TA"))
     print(stm.find_pattern("ACG"))
     print(stm.nodes_below(12))
-    print(stm.matches_prefix('TA'))
-    print(stm.matches_prefix('GT'))
-    print(stm.largestCommonSubstring())
+    print('matches_prefix: ', stm.matches_prefix('TA'))
+    print('matches_prefix: ', stm.matches_prefix('GT'))
+    print('largestCommonSubstring: ', stm.largestCommonSubstring())
 
 test()
