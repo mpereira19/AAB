@@ -157,7 +157,48 @@ def test2():
     print()
 
 
+def test3():
+    print("metabolite-reaction network:")
+    mr = MetabolicNetwork("metabolite-reaction")
+    mr.load_from_file("ecoli.txt")
+    mr.print_graph()
+    print("Reactions: ", len(mr.get_nodes_type("reaction")))
+    print("Metabolites: ", len(mr.get_nodes_type("metabolite")))
+    print()
+
+    print("metabolite-metabolite network:")
+    mm = MetabolicNetwork("metabolite-metabolite")
+    mm.load_from_file("ecoli.txt")
+    mm.print_graph()
+    print()
+
+    print("reaction-reaction network:")
+    rr = MetabolicNetwork("reaction-reaction")
+    rr.load_from_file("ecoli.txt")
+    rr.print_graph()
+    print()
+
+    print("metabolite-reaction network (splitting reversible):")
+    mrt = MetabolicNetwork("metabolite-reaction", True)
+    mrt.load_from_file("ecoli.txt")
+    mrt.print_graph()
+    print()
+
+    print("reaction-reaction network (splitting reversible):")
+    rrt = MetabolicNetwork("reaction-reaction", True)
+    rrt.load_from_file("ecoli.txt")
+    rrt.print_graph()
+    print()
+
+    mean_degree = mr.mean_degree("out")
+    print(f"Mean Degree: {mean_degree}")
+    print("Probability degree: ")
+    d = mr.prob_degree("out")
+    print([(x, d[x]) for x in sorted(d.keys())])
+
+
 test1()
 print()
 test2()
-
+print()
+test3()
