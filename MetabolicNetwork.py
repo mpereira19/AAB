@@ -192,9 +192,8 @@ def test3():
 
     mean_degree = mr.mean_degree("out")
     print(f"Mean Degree: {mean_degree}")
-    print("Probability degree: ")
-    d = mr.prob_degree("out")
-    print([(x, d[x]) for x in sorted(d.keys())])
+    prob_degree = mr.prob_degree("out")
+    print("Probability degree:", [(x, prob_degree[x]) for x in sorted(prob_degree.keys())])
 
 
 test1()
