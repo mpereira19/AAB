@@ -168,7 +168,7 @@ class MyGraph:
 			if node != s: res.append((node, dist))
 			for elem in self.graph[node]:
 				if not is_in_tuple_list(l, elem) and not is_in_tuple_list(res, elem):
-					l.append((elem, dist + 1))
+					l.append((elem, dist + self.cost[(node, elem)]))
 		return res
 
 	# cycles
@@ -300,8 +300,8 @@ def test5():
 
 
 if __name__ == "__main__":
-	# test1()
-	# test2()
-	# test3()
+	test1()
+	test2()
+	test3()
 	test4()
-	# test5()
+	test5()
