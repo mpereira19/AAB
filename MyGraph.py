@@ -363,7 +363,26 @@ class MyGraph:
 		edges_visit = list(self.get_edges())
 		res = []
 		while edges_visit:
-			pass  # completar aqui
+			pair = edges_visit[0]
+			i = 1
+			if res != []:
+				while pair[0] not in res:
+					pair = edges_visit[i]
+					i += 1
+			edges_visit.remove(pair)
+			start, nxt = pair
+			cycle = [start, nxt]
+			while nxt != start:
+				for suc in self.graph[nxt]:
+					if (nxt, suc) in edges_visit:
+						pair = (nxt, suc)
+						nxt = suc
+						cycle.append(nxt)
+						edges_visit.remove(pair)
+			if not res: res = cycle
+			else:
+				pos = res.index(cycle[0])
+				for i in range(len(cycle) - 1): res.insert(pos + i + 1, cycle[i + 1])
 		return res
 
 	def eulerian_path(self):
@@ -419,6 +438,7 @@ def test3():
 	print(gr.out_degree(2))
 	print(gr.degree(2))
 
+
 def test4():
 	gr = MyGraph({1: [2], 2: [3], 3: [2, 4], 4: [2]})
 	print(gr.shortest_path(1, 4))
@@ -426,7 +446,6 @@ def test4():
 
 	print(gr.reachable_with_dist(1))
 	print(gr.reachable_with_dist(3))
-
 
 	gr2 = MyGraph({1: [2, 3], 2: [4], 3: [5], 4: [], 5:[]})
 	print(gr2.shortest_path(1, 5))

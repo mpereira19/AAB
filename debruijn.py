@@ -69,11 +69,16 @@ def test2():
 def test3():
     orig_sequence = "ATGCAATGGTCTG"
     frags = composition(3, orig_sequence)
-    # ... completar
+    dbgr = DeBruijnGraph(frags)
+    dbgr.print_graph()
+    print(dbgr.check_nearly_balanced_graph())
+    p = dbgr.eulerian_path()
+    print(p)
+    print(dbgr.seq_from_path(p))
 
 
 test1()
-# print()
-# test2()
-# print()
-# test3()
+print()
+test2()
+print()
+test3()
